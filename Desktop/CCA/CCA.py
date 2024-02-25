@@ -1,19 +1,17 @@
 import time
-import collections
-import string
 
 def generate_vigenere_table():
-    """Generate Vigenère table"""
+    """Gera a tabela de Vigenère"""
     table = []
     for i in range(26):
         table.append([chr((i + j) % 26 + 65) for j in range(26)])
-    return table
+    return table 
 
 def vigenere_encrypt(plain_text, key, step_by_step=False):
-    """Encrypt using Vigenère cipher"""
+    """Encripta utilizando a cifra de Vigenère"""
     cipher_text = ""
     table = generate_vigenere_table()
-    print("\nEncryption Process:")
+    print("\nProcesso de Encriptação:")
     key_index = 0
     for char in plain_text:
         if char.isalpha():
@@ -22,42 +20,42 @@ def vigenere_encrypt(plain_text, key, step_by_step=False):
             cipher_char = table[row][col]
             cipher_text += cipher_char
             if step_by_step:
-                print("\033[1;34mPlainText Character is represented in Blue\033[0m")
-                print("\033[1;32mKey Character is represented in Green\033[0m")
-                print("\033[1;33mCalculated Character is represented in Yellow\033[0m")
-                print(f"Plaintext: {char}, Key: {key[key_index]}, Ciphered Char: {cipher_char}")
-                print("Vigenère Table (Highlighted):")
-                for i in range(len(table)): #Allows us to read the table in both directions "i" in rows and "j" in columns
+                print("\033[1;34mCarácter do Texto Normal é representado a Azul\033[0m")
+                print("\033[1;32mCarácter da Chave é representado a Verde\033[0m")
+                print("\033[1;33mCarácter Calculado é representado a Amarelo\033[0m")
+                print(f"Texto Normal: {char}, Chave: {key[key_index]}, Carácter Encriptado: {cipher_char}")
+                print("Tabela de Vigenère (Destacada):")
+                for i in range(len(table)): # Permite-nos ler a tabela em ambas as direções "i" nas linhas e "j" nas colunas
                     for j in range(len(table[i])):
-                        if i == row and j == col: #metting point of column and row
-                            print(f"\033[1;33m{table[i][j]}\033[0m", end=" ")  # Highlight using bold yellow text
-                        elif i == row: # Going through the row with a match
-                            if j == 0: #Key value
-                                print(f"\033[1;32m{table[i][j]}\033[0m", end=" ") # Highlight using bold green text the 
-                            elif j < col: # Highlight row red until condition met
-                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Highlight using bold red text
+                        if i == row and j == col: # ponto de encontro da coluna e linha
+                            print(f"\033[1;33m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto amarelo em negrito
+                        elif i == row: # Percorrer a linha com uma correspondência
+                            if j == 0: # valor da chave
+                                print(f"\033[1;32m{table[i][j]}\033[0m", end=" ") # Destaque usando texto verde em negrito
+                            elif j < col: # Destacar linha vermelha até a condição ser atendida
+                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto vermelho em negrito
                             else:
-                                print(table[i][j], end=" ")  # Normal text for elements after the condition
-                        elif j == col:  # Highlight column red until condition met
-                            if i == 0: #Plaintext value
-                                print(f"\033[1;34m{table[i][j]}\033[0m", end=" ") # Highlight using bold blue text the 
+                                print(table[i][j], end=" ")  # Texto normal para elementos após a condição
+                        elif j == col:  # Destaque coluna vermelha até a condição ser atendida
+                            if i == 0: # valor do texto normal
+                                print(f"\033[1;34m{table[i][j]}\033[0m", end=" ") # Destaque usando texto azul em negrito
                             elif i < row:
-                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Highlight using bold red text
+                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto vermelho em negrito
                             else:
-                                print(table[i][j], end=" ")  # Normal text for elements after the condition
+                                print(table[i][j], end=" ")  # Texto normal para elementos após a condição
                         else:
                             print(table[i][j], end=" ")
-                    print()  # Move to the next line after each row is printed
+                    print()  # Mover para a próxima linha após cada linha ser impressa
 
-                # Wait for space bar press to continue
-                input("Press ENTER to step...")
+                # Aguardar pressionamento da tecla de espaço para continuar
+                input("Pressione ENTER para continuar...")
             key_index = (key_index + 1) % len(key)
         else:
             cipher_text += char
     return cipher_text
 
 def vigenere_decrypt(cipher_text, key, step_by_step=False):
-    """Decrypt using Vigenère cipher"""
+    """Desencripta utilizando a cifra de Vigenère"""
     decrypted_text = ""
     table = generate_vigenere_table()
     key_index = 0
@@ -68,111 +66,118 @@ def vigenere_decrypt(cipher_text, key, step_by_step=False):
             plain_char = chr(col + 65)
             decrypted_text += plain_char
             if step_by_step:
-                print("\033[1;34mCiphertext Character is represented in Blue\033[0m")
-                print("\033[1;32mKey Character is represented in Green\033[0m")
-                print("\033[1;33mCalculated Character is represented in Yellow\033[0m")
-                print(f"Ciphertext: {char}, Key: {key[key_index]}, Deciphered Char: {plain_char}")
-                print("Vigenère Table (Highlighted):")
-                for i in range(len(table)): #Allows us to read the table in both directions "i" in rows and "j" in columns
+                print("\033[1;34mCarácter do Texto Cifrado é representado a Azul\033[0m")
+                print("\033[1;32mCarácter da Chave é representado a Verde\033[0m")
+                print("\033[1;33mCarácter Calculado é representado a Amarelo\033[0m")
+                print(f"Texto Cifrado: {char}, Chave: {key[key_index]}, Carácter Desencriptado: {plain_char}")
+                print("Tabela de Vigenère (Destacada):")
+                for i in range(len(table)): # Permite-nos ler a tabela em ambas as direções "i" nas linhas e "j" nas colunas
                     for j in range(len(table[i])):
-                        if i == row and j == col: #metting point of column and row
-                            print(f"\033[1;34m{table[i][j]}\033[0m", end=" ")  # Highlight using bold yellow text
-                        elif i == row: # Going through the row with a match
+                        if i == row and j == col: # ponto de encontro da coluna e linha
+                            print(f"\033[1;34m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto amarelo em negrito
+                        elif i == row: # Percorrer a linha com uma correspondência
                             if j == 0:
-                                print(f"\033[1;32m{table[i][j]}\033[0m", end=" ") # Highlight using bold blue text the 
-                            elif j < col: # Highlight row red until condition met
-                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Highlight using bold red text
+                                print(f"\033[1;32m{table[i][j]}\033[0m", end=" ") # Destaque usando texto azul em negrito
+                            elif j < col: # Destacar linha vermelha até a condição ser atendida
+                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto vermelho em negrito
                             else:
-                                print(table[i][j], end=" ")  # Normal text for elements after the condition
-                        elif j == col:  # Highlight column red until condition met
+                                print(table[i][j], end=" ")  # Texto normal para elementos após a condição
+                        elif j == col:  # Destaque coluna vermelha até a condição ser atendida
                             if i == 0:
-                                print(f"\033[1;33m{table[i][j]}\033[0m", end=" ") # Highlight using bold blue text the 
+                                print(f"\033[1;33m{table[i][j]}\033[0m", end=" ") # Destaque usando texto azul em negrito
                             elif i < row:
-                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Highlight using bold red text
+                                print(f"\033[1;31m{table[i][j]}\033[0m", end=" ")  # Destaque usando texto vermelho em negrito
                             else:
-                                print(table[i][j], end=" ")  # Normal text for elements after the condition
+                                print(table[i][j], end=" ")  # Texto normal para elementos após a condição
                         else:
                             print(table[i][j], end=" ")
-                    print()  # Move to the next line after each row is printed
-                # Wait for space bar press to continue
-                input("Press ENTER to step...")
+                    print()  # Mover para a próxima linha após cada linha ser impressa
+
+                # Aguardar pressionamento da tecla de espaço para continuar
+                input("Pressione ENTER para continuar...")
             key_index = (key_index + 1) % len(key)
         else:
             decrypted_text += char
     return decrypted_text
 
-def brute_force_attack(cipher_text):
-    """Brute force attack on Vigenère cipher"""
-    # Initialize an empty list to store decrypted texts
-    decrypted_texts = []
-    # Precalculate the Vigenère table
-    table = generate_vigenere_table()
-    # Record the start time of the brute force attack
-    start_time = time.time()
-    # Iterate over possible key lengths from 1 to the length of the cipher text
+def load_portuguese_words(file_path):
+    """Carrega as palavras em português de um arquivo de texto."""
+    # Abre o arquivo no caminho especificado
+    with open(file_path, 'r', encoding='latin1') as file:
+        # Retorna um conjunto de palavras em letras minúsculas, removendo espaços em branco e quebras de linha
+        return set(word.strip().lower() for word in file)
+
+def brute_force_attack(cipher_text, word_list):
+    """Ataque de força bruta na cifra de Vigenère"""
+    decrypted_texts = []  # Lista para armazenar os textos descriptografados
+    table = generate_vigenere_table()  # Gera a tabela de Vigenère
+    start_time = time.time()  # Registra o tempo inicial do ataque
+
+    # Itera sobre diferentes comprimentos de chave possíveis
     for key_length in range(1, len(cipher_text) + 1):
-        # Generate all possible keys of current key length
+        # Itera sobre todas as combinações possíveis de letras para a chave
         for key_index in range(26 ** key_length):
-            # Initialize an empty string to store the generated key
             key = ""
-            # Generate the key based on the current key index
             index = key_index
+            # Gera a chave baseada no índice atual
             for _ in range(key_length):
-                # Convert the index to base 26 and map it to corresponding character ('A' to 'Z')
                 key += chr(65 + index % 26)
-                # Update the index for the next character
                 index //= 26
-            # Decrypt the cipher text using the generated key
+
             decrypted_text = ""
             key_index = 0
-            # Perform local decryption for faster results
+            # Descriptografa o texto cifrado usando a chave atual
             for char in cipher_text:
-                if char.isalpha():
-                    row = ord(key[key_index].upper()) - 65
-                    col = table[row].index(char.upper())
-                    plain_char = chr(col + 65)
+                if char.isalpha():  # Verifica se o caractere é uma letra
+                    row = ord(key[key_index].upper()) - 65  # Calcula a linha na tabela de Vigenère
+                    col = table[row].index(char.upper())  # Calcula a coluna na tabela de Vigenère
+                    plain_char = chr(col + 65)  # Obtém o caractere descriptografado
                     decrypted_text += plain_char
-                    key_index = (key_index + 1) % len(key)
+                    key_index = (key_index + 1) % len(key)  # Move para a próxima letra na chave
                 else:
-                    decrypted_text += char
-            # Append the generated key and decrypted text as a tuple to the list of decrypted texts
-            decrypted_texts.append((key, decrypted_text))
-    # Record the end time of the brute force attack
-    end_time = time.time()
-    # Calculate the elapsed time for the brute force attack
-    elapsed_time = end_time - start_time
-    # Return the list of decrypted texts and the elapsed time
-    return decrypted_texts, elapsed_time
+                    decrypted_text += char  # Mantém os caracteres não alfabéticos intactos
+
+            if decrypted_text.lower() in word_list:
+                elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
+                return [(key, decrypted_text)], elapsed_time  # Retorna a chave e o texto descriptografado
+            else:
+                decrypted_texts.append((key, decrypted_text))  # Adiciona a chave e o texto descriptografado à lista de tentativas
+
+    elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
+    return decrypted_texts, elapsed_time  # Retorna todas as tentativas de descriptografia e o tempo decorrido
 
 
-def vigenere_frequency_attack(cipher_text):
-    """Frequency analysis attack on Vigenère cipher"""
+
+
+
+def vigenere_known_plaintext_attack(cipher_text, known_plain_text):
+    # A cifra de Vigenère funciona adicionando a letra correspondente da chave à letra correspondente do texto cifrado para obter a letra do texto original.
+    # Da mesma forma, para descriptografar, subtraímos a letra correspondente da chave da letra correspondente do texto cifrado.
+
+    # Suponha que temos a cifra 'c' e a chave 'k' e queremos encontrar o texto original 'p'.
+
+    # A fórmula de criptografia é: c(n) ≡ p(n) + k(n) mod 26
+    # E a fórmula de descriptografia é: p(n) ≡ c(n) - k(n) mod 26
+
+    # Para encontrar a chave 'k' conhecendo 'p' e 'c', simplesmente subtraímos 'p' de 'c'.
+    # k(n) ≡ c(n)− p(n) mod 26
+
+    """Known plaintext attack on Vigenère cipher"""
     # Remove non-alphabetic characters and convert to uppercase
     cipher_text = ''.join(filter(str.isalpha, cipher_text)).upper()
+    known_plain_text = ''.join(filter(str.isalpha, known_plain_text)).upper()
     
-    # Estimar o comprimento da chave
-    # Usaremos o índice de coincidência médio (Média dos índices de coincidência para diferentes deslocamentos)
-    ic_values = {}
-    for key_length in range(1, min(20, len(cipher_text))):  # Limitar a busca para comprimentos de chave de 1 a 20
-        sub_texts = [''] * key_length
-        for i, char in enumerate(cipher_text):
-            sub_texts[i % key_length] += char
-        ic_values[key_length] = sum((sum((count * (count - 1) for count in collections.Counter(sub_text).values())) / (len(sub_text) * (len(sub_text) - 1))) if len(sub_text) > 1 else 0 for sub_text in sub_texts) / key_length
-    estimated_key_length = max(ic_values, key=ic_values.get)
+    # Usaremos o comprimento do texto conhecido como tamanho da chave
+    key_length = len(known_plain_text)
     
     # Determinar a chave
-    possible_keys = [''] * estimated_key_length
-    for i, char in enumerate(cipher_text):
-        possible_keys[i % estimated_key_length] += char
-    key = ''
-    for sub_text in possible_keys:
-        max_freq = max(collections.Counter(sub_text).values())
-        most_common = [char for char, freq in collections.Counter(sub_text).items() if freq == max_freq]
-        # Assumir que o caractere mais comum em cada subtexto corresponde ao 'E' (caractere mais comum em inglês)
-        shift = (string.ascii_uppercase.index(most_common[0]) - string.ascii_uppercase.index('E')) % 26
-        key += string.ascii_uppercase[shift]
+    possible_keys = [''] * key_length
+    for i, char in enumerate(known_plain_text):
+        # Assumir que a cifra da letra conhecida é a letra conhecida
+        shift = (ord(cipher_text[i]) - ord(char)) % 26
+        possible_keys[i] = chr(65 + shift)
     
-    return key
+    return ''.join(possible_keys)
 
 
 
@@ -194,6 +199,7 @@ def print_menu():
     print("3. Encrypt step by step")
     print("4. Decrypt step by step")
     print("5. Brute force attack")
+    print("6. Known plaintext attack")
     print("7. Exit")
 
 def main():
@@ -227,14 +233,16 @@ def main():
             print_menu()
         elif choice == '5':
             cipher_text = input("Enter the ciphertext: ")
-            decrypted_texts, elapsed_time = brute_force_attack(cipher_text)
+            portuguese_words = load_portuguese_words("wordlist-preao-latest.txt")
+            decrypted_texts, elapsed_time = brute_force_attack(cipher_text, portuguese_words)
             for key, decrypted_text in decrypted_texts:
                 print(f"Key: {key}, Decrypted Text: {decrypted_text}")
             print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
             print_menu()
         elif choice == '6':
             cipher_text = input("Enter the ciphertext: ")
-            key = vigenere_frequency_attack(cipher_text)
+            known_plain_text = input("Enter the known plaintext: ")
+            key = vigenere_known_plaintext_attack(cipher_text, known_plain_text)
             print("Chave encontrada:", key)
             print_menu()
         elif choice == '7':
