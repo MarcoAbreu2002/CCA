@@ -1,4 +1,5 @@
 import time
+import re
 
 def generate_vigenere_table():
     """Gera a tabela de Vigenère"""
@@ -6,6 +7,17 @@ def generate_vigenere_table():
     for i in range(26):
         table.append([chr((i + j) % 26 + 65) for j in range(26)])
     return table 
+
+def get_valid_input(prompt):
+    """Solicita uma entrada válida do utilizador"""
+    padrao = re.compile(r'^[a-zA-Z0-9 ]+$')  # Aceita apenas letras (maiúsculas e minúsculas), números e espaços
+    
+    while True:
+        user_input = input(prompt)
+        if padrao.match(user_input):
+            return user_input
+        else:
+            print("Por favor, evite acentos e caracteres especiais.")
 
 def vigenere_encrypt(plain_text, key, step_by_step=False):
     """Encripta utilizando a cifra de Vigenère"""
@@ -107,46 +119,6 @@ def load_portuguese_words(file_path):
         # Retorna um conjunto de palavras em letras minúsculas, removendo espaços em branco e quebras de linha
         return set(word.strip().lower() for word in file)
 
-def brute_force_attack(cipher_text, word_list):
-    """Ataque de força bruta na cifra de Vigenère"""
-    decrypted_texts = []  # Lista para armazenar os textos descriptografados
-    table = generate_vigenere_table()  # Gera a tabela de Vigenère
-    start_time = time.time()  # Registra o tempo inicial do ataque
-
-    # Itera sobre diferentes comprimentos de chave possíveis
-    for key_length in range(1, len(cipher_text) + 1):
-        # Itera sobre todas as combinações possíveis de letras para a chave
-        for key_index in range(26 ** key_length):
-            key = ""
-            index = key_index
-            # Gera a chave baseada no índice atual
-            for _ in range(key_length):
-                key += chr(65 + index % 26)
-                index //= 26
-
-            decrypted_text = ""
-            key_index = 0
-            # Descriptografa o texto cifrado usando a chave atual
-            for char in cipher_text:
-                if char.isalpha():  # Verifica se o caractere é uma letra
-                    row = ord(key[key_index].upper()) - 65  # Calcula a linha na tabela de Vigenère
-                    col = table[row].index(char.upper())  # Calcula a coluna na tabela de Vigenère
-                    plain_char = chr(col + 65)  # Obtém o caractere descriptografado
-                    decrypted_text += plain_char
-                    key_index = (key_index + 1) % len(key)  # Move para a próxima letra na chave
-                else:
-                    decrypted_text += char  # Mantém os caracteres não alfabéticos intactos
-
-            if decrypted_text.lower() in word_list:
-                elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
-                return [(key, decrypted_text)], elapsed_time  # Retorna a chave e o texto descriptografado
-            else:
-                decrypted_texts.append((key, decrypted_text))  # Adiciona a chave e o texto descriptografado à lista de tentativas
-
-    elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
-    return decrypted_texts, elapsed_time  # Retorna todas as tentativas de descriptografia e o tempo decorrido
-
-
 
 
 
@@ -180,6 +152,103 @@ def vigenere_known_plaintext_attack(cipher_text, known_plain_text):
     return ''.join(possible_keys)
 
 
+import re
+
+def is_portuguese(text, word_percentage=40):
+    # You can adjust the word_percentage threshold as needed
+    word_count = len(re.findall(r'\b\w+\b', text))
+    total_words = word_count if word_count > 0 else 1
+    portuguese_words = len([word for word in re.findall(r'\b\w+\b', text) if is_portuguese_word(word)])
+    percentage = (portuguese_words / total_words) * 100
+    return percentage >= word_percentage
+
+def is_portuguese_word(word):
+    # You might want to enhance this function to better detect Portuguese words
+    # This is a simple check which might not cover all cases
+    portuguese_characters = 'ãàáâçéêíóôõúü'
+    return any(char in portuguese_characters for char in word.lower())
+
+def brute_force_attack(ciphertext, words):
+    for key_length in range(1, 6):
+        key_combinations = generate_keys()
+        for key in key_combinations:
+            decrypted_text = ''
+            key_index = 0
+            for char in ciphertext:
+                if char.isalpha():
+                    shift = ord('a' if char.islower() else 'A')
+                    key_char = key[key_index % len(key)]
+                    key_shift = ord(key_char.lower()) - ord('a')
+                    decrypted_char = chr((ord(char) - shift - key_shift) % 26 + shift)
+                    decrypted_text += decrypted_char
+                    key_index += 1
+                else:
+                    decrypted_text += char
+            if detecta_portugues(decrypted_text, words):
+                print()
+                print('Possible encryption break:')
+                print('Key ' + str(key) + ': ' + decrypted_text[:100])
+                print()
+                print('Press D to quit or just press Enter to continue:')
+                response = input('> ')
+                if response.upper().startswith('D'):
+                    return decrypted_text
+                
+
+def detecta_portugues(texto, palavras_portuguesas):
+    palavras_texto = re.findall(r'\b\w+\b', texto.lower())
+    total_palavras_portuguesas = sum(1 for palavra in palavras_texto if palavra in palavras_portuguesas)
+    porcentagem_portugues = (total_palavras_portuguesas / len(palavras_texto)) * 100
+    
+    # Define um limiar de porcentagem para considerar o texto como em português
+    if porcentagem_portugues >= 50:
+        return True
+    else:
+        return False
+
+
+def generate_keys():
+    keys = []
+    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    
+     #Generate keys with 1 character
+    for char in charset:
+        keys.append(char)
+    
+    # Generate keys with 2 characters
+    for char1 in charset:
+        for char2 in charset:
+            keys.append(char1 + char2)
+    
+    # Generate keys with 3 characters
+    for char1 in charset:
+        for char2 in charset:
+            for char3 in charset:
+                keys.append(char1 + char2 + char3)
+    
+    # Generate keys with 4 characters
+    for char1 in charset:
+        for char2 in charset:
+            for char3 in charset:
+                for char4 in charset:
+                    keys.append(char1 + char2 + char3 + char4)
+    
+    return keys
+
+def generate_key_combinations(words, key_length):
+    key_combinations = []
+    generate_key_combinations_recursive(words, key_length, '', key_combinations)
+    return key_combinations
+
+def generate_key_combinations_recursive(words, key_length, current_key, key_combinations):
+    if key_length == 0:
+        key_combinations.append(current_key)
+        return
+    for word in words:
+        generate_key_combinations_recursive(words, key_length - 1, current_key + word, key_combinations)
+
+
+
 
 def print_menu():
     """Print the menu"""
@@ -200,7 +269,8 @@ def print_menu():
     print("4. Decrypt step by step")
     print("5. Brute force attack")
     print("6. Known plaintext attack")
-    print("7. Exit")
+    print("7. Frequency analysis attack")
+    print("8. Exit")
 
 def main():
     print_menu()
@@ -208,44 +278,49 @@ def main():
         choice = input("Enter your choice: ")
         
         if choice == '1':
-            plain_text = input("Enter the plaintext: ")
+            plain_text = get_valid_input("Enter the plaintext: ")
             key = input("Enter the key: ")
             cipher_text = vigenere_encrypt(plain_text, key)
             print("\nCiphered Text:", cipher_text)
             print_menu()
         elif choice == '2':
-            cipher_text = input("Enter the ciphertext: ")
+            cipher_text = get_valid_input("Enter the ciphertext: ")
             key = input("Enter the key: ")
             decrypted_text = vigenere_decrypt(cipher_text, key)
             print("\nDecrypted Text:", decrypted_text)
             print_menu()
         elif choice == '3':
-            plain_text = input("Enter the plaintext: ")
+            plain_text = get_valid_input("Enter the plaintext: ")
             key = input("Enter the key: ")
             cipher_text = vigenere_encrypt(plain_text, key, step_by_step=True)
             print("\nCiphered Text:", cipher_text)
             print_menu()
         elif choice == '4':
-            cipher_text = input("Enter the ciphertext: ")
+            cipher_text = get_valid_input("Enter the ciphertext: ")
             key = input("Enter the key: ")
             decrypted_text = vigenere_decrypt(cipher_text, key, step_by_step=True)
             print("\nDecrypted Text:", decrypted_text)
             print_menu()
         elif choice == '5':
-            cipher_text = input("Enter the ciphertext: ")
+            cipher_text = get_valid_input("Enter the ciphertext: ")
             portuguese_words = load_portuguese_words("wordlist-preao-latest.txt")
-            decrypted_texts, elapsed_time = brute_force_attack(cipher_text, portuguese_words)
-            for key, decrypted_text in decrypted_texts:
-                print(f"Key: {key}, Decrypted Text: {decrypted_text}")
-            print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
+            decrypted_texts= brute_force_attack(cipher_text, portuguese_words)
+            #for key, decrypted_text in decrypted_texts:
+            #    print(f"Key: {key}, Decrypted Text: {decrypted_text}")
+            #print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
             print_menu()
         elif choice == '6':
-            cipher_text = input("Enter the ciphertext: ")
+            cipher_text = get_valid_input("Enter the ciphertext: ")
             known_plain_text = input("Enter the known plaintext: ")
             key = vigenere_known_plaintext_attack(cipher_text, known_plain_text)
             print("Chave encontrada:", key)
             print_menu()
         elif choice == '7':
+            cipher_text = get_valid_input("Enter the ciphertext: ")
+            #key_lengths = guess_key_length(cipher_text)
+            print("Possible key lengths:", key_lengths)
+            print_menu()
+        elif choice == '8':
             print("Exiting...")
             break
         else:
