@@ -10,14 +10,14 @@ def generate_vigenere_table():
 
 def get_valid_input(prompt):
     """Solicita uma entrada válida do utilizador"""
-    padrao = re.compile(r'^[a-zA-Z0-9 ]+$')  # Aceita apenas letras (maiúsculas e minúsculas), números e espaços
+    padrao = re.compile(r'^[a-zA-Z ]+$')  # Aceita apenas letras (maiúsculas e minúsculas) e espaços
     
     while True:
         user_input = input(prompt)
         if padrao.match(user_input):
             return user_input
         else:
-            print("Por favor, evite acentos e caracteres especiais.")
+            print("Por favor, insira apenas letras (sem acentos) e espaços.")
 
 def vigenere_encrypt(plain_text, key, step_by_step=False):
     """Encripta utilizando a cifra de Vigenère"""
