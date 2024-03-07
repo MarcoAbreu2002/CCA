@@ -152,8 +152,6 @@ def vigenere_known_plaintext_attack(cipher_text, known_plain_text):
     return ''.join(possible_keys)
 
 
-import re
-
 def is_portuguese(text, word_percentage=40):
     # You can adjust the word_percentage threshold as needed
     word_count = len(re.findall(r'\b\w+\b', text))
@@ -168,31 +166,57 @@ def is_portuguese_word(word):
     portuguese_characters = 'ãàáâçéêíóôõúü'
     return any(char in portuguese_characters for char in word.lower())
 
-def brute_force_attack(ciphertext, words):
-    for key_length in range(1, 6):
-        key_combinations = generate_keys()
-        for key in key_combinations:
-            decrypted_text = ''
-            key_index = 0
-            for char in ciphertext:
-                if char.isalpha():
-                    shift = ord('a' if char.islower() else 'A')
-                    key_char = key[key_index % len(key)]
-                    key_shift = ord(key_char.lower()) - ord('a')
-                    decrypted_char = chr((ord(char) - shift - key_shift) % 26 + shift)
-                    decrypted_text += decrypted_char
-                    key_index += 1
-                else:
-                    decrypted_text += char
-            if detecta_portugues(decrypted_text, words):
-                print()
-                print('Possible encryption break:')
-                print('Key ' + str(key) + ': ' + decrypted_text[:100])
-                print()
-                print('Press D to quit or just press Enter to continue:')
-                response = input('> ')
-                if response.upper().startswith('D'):
-                    return decrypted_text
+def brute_force_attack(cipher_text, word_list):
+    """Ataque de força bruta na cifra de Vigenère"""
+    decrypted_texts = []  # Lista para armazenar os textos descriptografados
+    table = generate_vigenere_table()  # Gera a tabela de Vigenère
+    start_time = time.time()  # Registra o tempo inicial do ataque
+    key_combinations = generate_keys()
+    for key in key_combinations:
+        decrypted_text = ''
+        key_index = 0
+        for char in cipher_text:
+            if char.isalpha():  # Verifica se o caractere é uma letra
+                row = ord(key[key_index].upper()) - 65  # Calcula a linha na tabela de Vigenère
+                col = table[row].index(char.upper())  # Calcula a coluna na tabela de Vigenère
+                plain_char = chr(col + 65)  # Obtém o caractere descriptografado
+                decrypted_text += plain_char
+                key_index = (key_index + 1) % len(key)  # Move para a próxima letra na chave
+            else:
+                decrypted_text += char  # Mantém os caracteres não alfabéticos intactos
+        if key == "BEJA":
+            print("Heelo")
+        # Split decrypted text into words and check each word against the word list
+        decrypted_words = decrypted_text.split()
+        all_words_in_word_list = all(word.lower() in word_list for word in decrypted_words)
+        
+        if all_words_in_word_list:
+            elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
+            return [(key, decrypted_text)], elapsed_time  # Retorna a chave e o texto descriptografado
+        else:
+            decrypted_texts.append((key, decrypted_text))  # Adiciona a chave e o texto descriptografado à lista de tentativas
+
+    elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
+    return decrypted_texts, elapsed_time  # Retorna todas as tentativas de descriptografia e o tempo decorrido
+
+
+def generate_keys():
+    charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    keys = []
+
+    # Helper function to recursively generate combinations
+    def generate_combinations(prefix, length):
+        if length == 0:
+            keys.append(prefix)
+            return
+        for char in charset:
+            generate_combinations(prefix + char, length - 1)
+
+    # Generate keys with length from 1 to 7
+    for length in range(1, 6):
+        generate_combinations('', length)
+
+    return keys
                 
 
 def detecta_portugues(texto, palavras_portuguesas):
@@ -207,33 +231,6 @@ def detecta_portugues(texto, palavras_portuguesas):
         return False
 
 
-def generate_keys():
-    keys = []
-    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    
-     #Generate keys with 1 character
-    for char in charset:
-        keys.append(char)
-    
-    # Generate keys with 2 characters
-    for char1 in charset:
-        for char2 in charset:
-            keys.append(char1 + char2)
-    
-    # Generate keys with 3 characters
-    for char1 in charset:
-        for char2 in charset:
-            for char3 in charset:
-                keys.append(char1 + char2 + char3)
-    
-    # Generate keys with 4 characters
-    for char1 in charset:
-        for char2 in charset:
-            for char3 in charset:
-                for char4 in charset:
-                    keys.append(char1 + char2 + char3 + char4)
-    
-    return keys
 
 def generate_key_combinations(words, key_length):
     key_combinations = []
