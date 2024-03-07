@@ -202,23 +202,7 @@ def generate_keys():
         generate_combinations('', length)
 
     return keys
-                
-
-
-def generate_key_combinations(words, key_length):
-    key_combinations = []
-    generate_key_combinations_recursive(words, key_length, '', key_combinations)
-    return key_combinations
-
-def generate_key_combinations_recursive(words, key_length, current_key, key_combinations):
-    if key_length == 0:
-        key_combinations.append(current_key)
-        return
-    for word in words:
-        generate_key_combinations_recursive(words, key_length - 1, current_key + word, key_combinations)
-
-
-
+    
 
 def print_menu():
     """Print the menu"""
