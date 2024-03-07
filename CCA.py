@@ -152,19 +152,6 @@ def vigenere_known_plaintext_attack(cipher_text, known_plain_text):
     return ''.join(possible_keys)
 
 
-def is_portuguese(text, word_percentage=40):
-    # You can adjust the word_percentage threshold as needed
-    word_count = len(re.findall(r'\b\w+\b', text))
-    total_words = word_count if word_count > 0 else 1
-    portuguese_words = len([word for word in re.findall(r'\b\w+\b', text) if is_portuguese_word(word)])
-    percentage = (portuguese_words / total_words) * 100
-    return percentage >= word_percentage
-
-def is_portuguese_word(word):
-    # You might want to enhance this function to better detect Portuguese words
-    # This is a simple check which might not cover all cases
-    portuguese_characters = 'ãàáâçéêíóôõúü'
-    return any(char in portuguese_characters for char in word.lower())
 
 def brute_force_attack(cipher_text, word_list):
     """Ataque de força bruta na cifra de Vigenère"""
@@ -184,8 +171,6 @@ def brute_force_attack(cipher_text, word_list):
                 key_index = (key_index + 1) % len(key)  # Move para a próxima letra na chave
             else:
                 decrypted_text += char  # Mantém os caracteres não alfabéticos intactos
-        if key == "BEJA":
-            print("Heelo")
         # Split decrypted text into words and check each word against the word list
         decrypted_words = decrypted_text.split()
         all_words_in_word_list = all(word.lower() in word_list for word in decrypted_words)
@@ -218,18 +203,6 @@ def generate_keys():
 
     return keys
                 
-
-def detecta_portugues(texto, palavras_portuguesas):
-    palavras_texto = re.findall(r'\b\w+\b', texto.lower())
-    total_palavras_portuguesas = sum(1 for palavra in palavras_texto if palavra in palavras_portuguesas)
-    porcentagem_portugues = (total_palavras_portuguesas / len(palavras_texto)) * 100
-    
-    # Define um limiar de porcentagem para considerar o texto como em português
-    if porcentagem_portugues >= 50:
-        return True
-    else:
-        return False
-
 
 
 def generate_key_combinations(words, key_length):
@@ -301,10 +274,10 @@ def main():
         elif choice == '5':
             cipher_text = get_valid_input("Enter the ciphertext: ")
             portuguese_words = load_portuguese_words("wordlist-preao-latest.txt")
-            decrypted_texts= brute_force_attack(cipher_text, portuguese_words)
-            #for key, decrypted_text in decrypted_texts:
-            #    print(f"Key: {key}, Decrypted Text: {decrypted_text}")
-            #print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
+            decrypted_texts, elapsed_time = brute_force_attack(cipher_text, portuguese_words)
+            for key, decrypted_text in decrypted_texts:
+                print(f"Key: {key}, Decrypted Text: {decrypted_text}")
+            print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
             print_menu()
         elif choice == '6':
             cipher_text = get_valid_input("Enter the ciphertext: ")
@@ -315,7 +288,7 @@ def main():
         elif choice == '7':
             cipher_text = get_valid_input("Enter the ciphertext: ")
             #key_lengths = guess_key_length(cipher_text)
-            print("Possible key lengths:", key_lengths)
+            #print("Possible key lengths:", key_lengths)
             print_menu()
         elif choice == '8':
             print("Exiting...")
