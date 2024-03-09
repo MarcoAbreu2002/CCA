@@ -1,4 +1,7 @@
+import os
+import sys
 import time
+from collections import Counter
 import re
 
 def generate_vigenere_table():
@@ -23,7 +26,6 @@ def vigenere_encrypt(plain_text, key, step_by_step=False):
     """Encripta utilizando a cifra de Vigenère"""
     cipher_text = ""
     table = generate_vigenere_table()
-    print("\nProcesso de Encriptação:")
     key_index = 0
     for char in plain_text:
         if char.isalpha():
@@ -32,6 +34,7 @@ def vigenere_encrypt(plain_text, key, step_by_step=False):
             cipher_char = table[row][col]
             cipher_text += cipher_char
             if step_by_step:
+                print("\nProcesso de Encriptação:")
                 print("\033[1;34mCarácter do Texto Normal é representado a Azul\033[0m")
                 print("\033[1;32mCarácter da Chave é representado a Verde\033[0m")
                 print("\033[1;33mCarácter Calculado é representado a Amarelo\033[0m")
@@ -78,6 +81,7 @@ def vigenere_decrypt(cipher_text, key, step_by_step=False):
             plain_char = chr(col + 65)
             decrypted_text += plain_char
             if step_by_step:
+                print("\nProcesso de Desencriptação:")
                 print("\033[1;34mCarácter do Texto Cifrado é representado a Azul\033[0m")
                 print("\033[1;32mCarácter da Chave é representado a Verde\033[0m")
                 print("\033[1;33mCarácter Calculado é representado a Amarelo\033[0m")
@@ -184,7 +188,6 @@ def brute_force_attack(cipher_text, word_list):
     elapsed_time = time.time() - start_time  # Calcula o tempo decorrido
     return decrypted_texts, elapsed_time  # Retorna todas as tentativas de descriptografia e o tempo decorrido
 
-
 def generate_keys():
     charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     keys = []
@@ -203,6 +206,17 @@ def generate_keys():
 
     return keys
     
+    
+
+def clear_screen():
+    """
+    Clear the screen based on the operating system.
+    """
+    if sys.platform.startswith('win'):
+        os.system('cls')  # For Windows
+    else:
+        os.system('clear')  # For Linux and macOS
+        
 
 def print_menu():
     """Print the menu"""
@@ -216,69 +230,59 @@ def print_menu():
                                                                  
     """
     print(menu)
-    print("Select an option:")
-    print("1. Encrypt")
-    print("2. Decrypt")
-    print("3. Encrypt step by step")
-    print("4. Decrypt step by step")
-    print("5. Brute force attack")
-    print("6. Known plaintext attack")
-    print("7. Frequency analysis attack")
-    print("8. Exit")
+    print("Escolha uma opção: ")
+    print("1. Encriptar")
+    print("2. Desencriptar")
+    print("3. Encriptar passo a passo")
+    print("4. Desencriptar passo a passo")
+    print("5. Ataque de força bruta")
+    print("6. Ataque de texto conhecido")
+    print("7. Sair")
 
 def main():
-    print_menu()
     while True:
-        choice = input("Enter your choice: ")
+        clear_screen()
+        print_menu()
+        choice = input("Escolha uma opção: ")
         
         if choice == '1':
-            plain_text = get_valid_input("Enter the plaintext: ")
-            key = input("Enter the key: ")
+            plain_text = get_valid_input("Introduza o texto: ")
+            key = input("Introduza a chave de encriptação (máximo 6 caratéres): ")
             cipher_text = vigenere_encrypt(plain_text, key)
-            print("\nCiphered Text:", cipher_text)
-            print_menu()
+            print("\nTexto Encriptado:", cipher_text)
         elif choice == '2':
-            cipher_text = get_valid_input("Enter the ciphertext: ")
-            key = input("Enter the key: ")
+            cipher_text = get_valid_input("Introduza o criptograma: ")
+            key = input("Introduza a chave de encriptação (máximo 6 caratéres): ")
             decrypted_text = vigenere_decrypt(cipher_text, key)
-            print("\nDecrypted Text:", decrypted_text)
-            print_menu()
+            print("\nTexto desencriptado:", decrypted_text)
         elif choice == '3':
-            plain_text = get_valid_input("Enter the plaintext: ")
-            key = input("Enter the key: ")
+            plain_text = get_valid_input("Introduza o texto: ")
+            key = input("Introduza a chave de encriptação (máximo 6 caratéres): ")
             cipher_text = vigenere_encrypt(plain_text, key, step_by_step=True)
-            print("\nCiphered Text:", cipher_text)
-            print_menu()
+            print("\nTexto Encriptado:", cipher_text)
         elif choice == '4':
-            cipher_text = get_valid_input("Enter the ciphertext: ")
-            key = input("Enter the key: ")
+            cipher_text = get_valid_input("Introduza o criptograma: ")
+            key = input("Introduza a chave de encriptação (máximo 6 caratéres): ")
             decrypted_text = vigenere_decrypt(cipher_text, key, step_by_step=True)
-            print("\nDecrypted Text:", decrypted_text)
-            print_menu()
+            print("\nTexto desencriptado:", decrypted_text)
         elif choice == '5':
-            cipher_text = get_valid_input("Enter the ciphertext: ")
+            cipher_text = get_valid_input("Introduza o criptograma: ")
             portuguese_words = load_portuguese_words("wordlist-preao-latest.txt")
             decrypted_texts, elapsed_time = brute_force_attack(cipher_text, portuguese_words)
             for key, decrypted_text in decrypted_texts:
-                print(f"Key: {key}, Decrypted Text: {decrypted_text}")
-            print(f"Brute force attack completed in {elapsed_time:.2f} seconds.")
-            print_menu()
+                print(f"Chave: {key}, Texto desencriptado: {decrypted_text}")
+            print(f"Ataque de força bruta concluído em {elapsed_time:.2f} segundos.")
         elif choice == '6':
-            cipher_text = get_valid_input("Enter the ciphertext: ")
-            known_plain_text = input("Enter the known plaintext: ")
+            cipher_text = get_valid_input("Introduza o criptograma: ")
+            known_plain_text = input("Introduza o texto: ")
             key = vigenere_known_plaintext_attack(cipher_text, known_plain_text)
             print("Chave encontrada:", key)
-            print_menu()
         elif choice == '7':
-            cipher_text = get_valid_input("Enter the ciphertext: ")
-            #key_lengths = guess_key_length(cipher_text)
-            #print("Possible key lengths:", key_lengths)
-            print_menu()
-        elif choice == '8':
-            print("Exiting...")
+            print("Saindo...")
             break
         else:
-            print("Invalid choice. Please enter a valid option.")
-
+            print("Opção inválida! Escolha outra opção.")
+        input("Pressione ENTER para continuar...")
+        
 if __name__ == "__main__":
     main()
